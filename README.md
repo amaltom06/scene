@@ -31,6 +31,8 @@ MONGODB_URI=mongodb+srv://USER:PASSWORD@cluster.example/scene
 CORS_ORIGIN=https://your-scene-domain.com
 AUTH_SECRET=replace-with-a-long-random-secret-before-production
 VITE_API_BASE_URL=https://api.your-scene-domain.com
+GOOGLE_CLIENT_ID=your-google-oauth-web-client-id.apps.googleusercontent.com
+VITE_GOOGLE_CLIENT_ID=your-google-oauth-web-client-id.apps.googleusercontent.com
 ```
 
 Build the client with `npm run build`; deploy `dist/` through your static host, and deploy `server/index.js` as the API service. Set `VITE_API_BASE_URL` only if the client and API use different domains; leave it blank when the static host proxies `/api` to the API service.
@@ -49,3 +51,11 @@ Build the client with `npm run build`; deploy `dist/` through your static host, 
 - `POST /api/scenes/:sceneId/messages`
 
 Authentication uses signed, HTTP-only, seven-day session cookies and passwords are hashed with Node's built-in scrypt implementation. Set a unique, long `AUTH_SECRET` in every production environment and use HTTPS so the session cookie is secure.
+
+### Google sign-in
+
+Create a **Web application** OAuth client in Google Cloud, add your local and production browser origins, then set the same client ID in both `GOOGLE_CLIENT_ID` and `VITE_GOOGLE_CLIENT_ID`. The client secret is not used in this token-based browser flow and must never be placed in a Vite environment variable.
+
+### Payments
+
+Scenes can collect a price and show a reservation/payment state. Taking a real payment needs a payment-provider merchant account and its server-side credentials (for example, Razorpay or Stripe); those have intentionally not been embedded in the client application.
