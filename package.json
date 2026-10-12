@@ -7,8 +7,11 @@
     "dev": "vite",
     "server": "node --watch server/index.js",
     "dev:full": "concurrently -k \"npm:dev\" \"npm:server\"",
+    "demo:seed": "node server/seed-demo.js",
+    "demo:assets": "node server/cache-demo-images.js",
     "build": "vite build",
     "lint": "oxlint src server",
+    "test": "node --test",
     "preview": "vite preview"
   },
   "dependencies": {
