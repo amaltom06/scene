@@ -88,12 +88,22 @@ export function validateDemoData(data) {
   fail(unique(pairs), 'friendship pairs must be unique.')
 }
 
-export async function seedDemoData({ mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/scene', now = new Date(), password = process.env.DEMO_PASSWORD || 'SceneDemo!2026', fixtures = buildDemoData({ now }) } = {}) {
-  assertDemoTarget(mongoUri)
+export function assertHostedDemoTarget(mongoUri) {
+  let target
+  try { target = new URL(mongoUri) } catch { throw new Error('Set DEMO_MONGODB_URI to the Atlas scene_demo database.') }
+  if (target.protocol !== 'mongodb+srv:' || !target.hostname.endsWith('.mongodb.net') || target.pathname !== '/scene_demo' || !target.username || !target.password) {
+    throw new Error('Hosted demo seeding requires an authenticated Atlas URI with the database name scene_demo.')
+  }
+}
+
+export async function seedDemoData({ mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/scene', now = new Date(), password = process.env.DEMO_PASSWORD || 'SceneDemo!2026', fixtures = buildDemoData({ now }), target = 'local' } = {}) {
+  if (target === 'hosted-demo') assertHostedDemoTarget(mongoUri)
+  else if (target === 'local') assertDemoTarget(mongoUri)
+  else throw new Error('Unknown demo seed target.')
   fail(validDate(now), 'the reference time must be valid.')
   fail(typeof password === 'string' && password.length >= 8 && password.length <= 128, 'the demo password needs 8–128 characters.')
   validateDemoData(fixtures)
-  const connection = await mongoose.createConnection(mongoUri, { serverSelectionTimeoutMS: 5000, directConnection: true }).asPromise()
+  const connection = await mongoose.createConnection(mongoUri, { serverSelectionTimeoutMS: 10000, ...(target === 'local' ? { directConnection: true } : {}) }).asPromise()
   try {
     const models = Object.fromEntries(Object.entries(groupModels).map(([group, model]) => [group, connection.model(model.modelName, model.schema)]))
     const existing = {}

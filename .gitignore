@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 uploads/
+.env
+.env.*
+!.env.example
+.vercel/
 *.local
 
 # Editor directories and files

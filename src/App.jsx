@@ -419,7 +419,7 @@ function ProfileDialog({ user, onClose, onSaved, notify }) {
   const choosePhoto = (event) => {
     const file = event.target.files?.[0]
     if (!file) return
-    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) { notify('Choose a PNG, JPEG, or WebP photo under 5 MB.'); event.target.value = ''; return }
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 3 * 1024 * 1024) { notify('Choose a PNG, JPEG, or WebP photo under 3 MB.'); event.target.value = ''; return }
     if (preview) URL.revokeObjectURL(preview)
     setPhoto(file)
     setPreview(URL.createObjectURL(file))

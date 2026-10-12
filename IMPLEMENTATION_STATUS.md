@@ -1,5 +1,12 @@
 # SCENE implementation status
 
+## Vercel and Atlas deployment preparation
+
+- Added a Vercel Express function, API routing, Node 24 configuration, and a reusable small MongoDB connection pool. The frontend and backend share one HTTPS origin; deployment URLs are explicitly allowed, and production requires a database URI and strong secret.
+- Added MongoDB storage for hosted profile photos and a 3 MB upload cap compatible with Vercel Function payload limits. Existing local filesystem storage remains supported.
+- Added a separate hosted fixture command restricted to the authenticated Atlas `scene_demo` database. The original local seeding restrictions remain. Shared local demo credentials stay disabled in production.
+- Added a deployment guide and secret-file exclusions. Deployment tests cover secure cookies, origin rejection, JSON/binary parsing, photo persistence after reconnect, API 404s, and hosted-seed target restrictions. All 9 tests pass. Live deployment still requires the user's Vercel account and Atlas database configuration.
+
 ## Populated local demo community
 
 - Added an explicit `npm run demo:seed` workflow and populated the running local database with 20 fictional profiles, 40 scenes, 15 posts, 30 member messages, and 12 friendships. Existing accounts and scenes are preserved.

@@ -40,7 +40,7 @@ Email verification and password reset use the Resend HTTP API when both `RESEND_
 
 Accounts use email and password for sign-up, sign-in, and logout. Password reset and email verification require the configured email sender. Existing Google-created accounts can set a password through the reset link if email delivery is configured. Set `VITE_API_BASE_URL` only when the client and API have different origins; otherwise proxy `/api` to the API.
 
-Profile photos can be uploaded as PNG, JPEG, or WebP images up to 5 MB. Files are saved under `AVATAR_UPLOAD_DIR` (default `uploads/avatars`) and served from `/api/avatars/`. Keep this directory on persistent storage in deployment; it is ignored by Git.
+Profile photos can be uploaded as PNG, JPEG, or WebP images up to 3 MB. Local development saves them under `AVATAR_UPLOAD_DIR` (default `uploads/avatars`). Set `AVATAR_STORAGE=mongodb` to persist hosted photos in MongoDB; this is also the default on Vercel. Both modes serve photos from `/api/avatars/`. Filesystem storage needs a persistent disk on hosts that support one.
 
 ## Implemented API
 
@@ -66,7 +66,7 @@ Open `http://localhost:5173` and sign in with:
 
 Aarav has confirmed plans and passes, 4 saved events, a pending pottery request, past/cancelled attendance, and 3 hosted scenes including a private draft and an approval event with pending guests. Try Home, Explore, Nearby, Posts, People, My plans, Chats, and the organiser desk.
 
-To populate another local checkout, run `npm run demo:seed`. The seed validates schema and graph relationships before insertion, rejects production and remote/system databases, and preserves existing accounts and all interactions when rerun. Other fictional profiles have no password and cannot sign in. Reserved `.test` emails are unverified; seeding sends no account emails. Set `DEMO_PASSWORD` before the first seed to choose a different demo password; rerunning never changes an existing password.
+To populate another local checkout, run `npm run demo:seed`. The local seed validates schema and graph relationships before insertion, rejects production and remote/system databases, and preserves existing accounts and all interactions when rerun. The separate `npm run demo:seed:hosted` command only accepts an authenticated Atlas URI for the dedicated `scene_demo` database; see [the deployment guide](DEPLOYMENT.md). Other fictional profiles have no password and cannot sign in. Reserved `.test` emails are unverified; seeding sends no account emails. Set `DEMO_PASSWORD` before the first local seed to choose a different demo password; rerunning never changes an existing password.
 
 Schedules are relative to the first seed time in `Asia/Kolkata`; rerunning preserves dates and content. The demo includes intentional past, cancelled, full, draft, and private scenarios. Public discovery hides unavailable private/draft/ended/cancelled records according to the same rules as normal events.
 
@@ -74,6 +74,8 @@ Profile avatars are local illustrations. Generic event photos come from the veri
 
 ## Deployment notes
 
-Deploy the Vite `dist/` files through a static host and `server/index.js` as the API. Use HTTPS, a managed MongoDB service, a strong `AUTH_SECRET`, explicit `CORS_ORIGIN`, and a configured email sender. Proxy `/api` or set `VITE_API_BASE_URL` at build time. Paid bookings are disabled until a verified payment provider is integrated; no card details are collected.
+Follow [Free deployment on Vercel + MongoDB Atlas](DEPLOYMENT.md) to host the frontend, backend, database, and persistent profile photos for a personal demo. The Vercel API entry point is `api/index.js`; `server/index.js` remains the local Node server. The frontend and API share one domain. Production startup requires a configured database URI and a random authentication secret of at least 32 characters.
+
+Other hosts can serve Vite's `dist/` and run `npm start` for the API. Use HTTPS, a managed MongoDB service, explicit app origins, and a configured email sender. Proxy `/api` or set `VITE_API_BASE_URL` at build time. Paid bookings are disabled until a verified payment provider is integrated; no card details are collected.
 
 Review the remaining security, privacy, accessibility, and operations work in [Implementation status](IMPLEMENTATION_STATUS.md) before a public launch.
